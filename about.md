@@ -4,8 +4,12 @@ title: About
 permalink: /about/
 ---
 
-This is the base Jekyll theme. You can find out more info about customizing your Jekyll theme, as well as basic Jekyll usage documentation at [jekyllrb.com](http://jekyllrb.com/)
+# rhythm.vision
 
-You can find the source code for the Jekyll new theme at: [github.com/jglovier/jekyll-new](https://github.com/jglovier/jekyll-new)
+For now: A home for all of Kyle Grover's audio, video, and especially audiovideo art.
 
-You can find the source code for Jekyll at [github.com/jekyll/jekyll](https://github.com/jekyll/jekyll)
+In the future: Something larger than one person, a collective or a platform. 
+
+Interests: Fully performative A/V. Audioreactive visuals. Videoreactive audio. Crossmedia feedback loops. Music Videos. Code Art.
+
+Wanna grow this thing? Contact me @ kyleatkylegroverdotcom
