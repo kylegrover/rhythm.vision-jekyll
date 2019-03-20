@@ -1,14 +1,14 @@
 # Site settings
-title: Your awesome title
-email: your-email@domain.com
-description: > # this means to ignore newlines until "baseurl:"
-  Write an awesome description for your new site here. You can edit this
-  line in _config.yml. It will appear in your document head meta (for
-  Google search results) and in your feed.xml site description.
+title: Rhythm.Vision
+email: kyle@kylegrover.com
+description: > 
+  Rhythm.Vision is the home of all Kyle Grover's Video Fuckery, Audio Fuckery, and - most importantly - A/V Fuckery
 baseurl: "" # the subpath of your site, e.g. /blog/
 url: "https://rhythm.vision" # the base hostname & protocol for your site
 twitter_username: jekyllrb
 github_username:  jekyll
+facebook_username: rhythmdotvision
+instagram_username: rhythm.vision
 port: 1234
 
 # Build settings

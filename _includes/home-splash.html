@@ -1,0 +1,200 @@
+<div id="home-splash" class="homepage-splash-tile"></div>
+
+<style>
+    body.home #content {
+        margin-top: 0;
+    }
+    body.home #inner-content {
+        width: 100%;
+    }    
+    .homepage-video {
+        text-decoration: none;
+        height: 95vh;
+        display: flex; 
+        align-items: center; 
+        justify-content: center;
+        background-size: cover;
+        background-position: center;
+        position: relative;
+    }
+    .homepage-video .vid-text-wrap {
+        background: rgba(0,0,0,0.3);
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        display: flex;
+        align-items: flex-end;
+        justify-content: center;
+    }
+    .homepage-video:hover {
+        z-index: 9;
+    }
+    .homepage-video-post-title {
+        color: #fff;
+        font-size: 2em;
+        text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+        text-align: center;
+        margin-bottom: 30px;
+    }
+    .homepage-video .video-overlay-play-button {
+        position: absolute; 
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        height: 70px;
+        fill: white;
+        opacity: 0.7;
+        transition: 0.2s opacity ease, 0.2s height ease;
+    }
+    .homepage-video:hover .video-overlay-play-button {
+        height: 80px;
+        opacity: 0.8;
+    }
+    .homepage-video .video-overlay-play-button circle {
+        stroke: white;
+    }
+    .homepage-video .video-overlay-play-button polygon {
+        fill: white;
+    }
+</style>
+
+
+<script src="https://sub-freq.com/wp-content/themes/skeletor/library/three.js"></script>
+<script src="https://sub-freq.com/wp-content/themes/skeletor/library/WebGL.js"></script>
+<script id="vertexShader" type="x-shader/x-vertex">
+    varying vec2 vUv;
+    void main()	{
+        vUv = uv;
+        gl_Position = vec4( position, 1.0 );
+    }
+</script>
+<script id="fragmentShader" type="x-shader/x-fragment">
+    // Simplfied port of Oil by Patricio Gonzalez Vivo
+    // http://www.kamend.com/2012/06/perlin-noise-and-glsl/
+
+    vec4 mod289 (vec4 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
+    vec4 permute (vec4 x) { return mod289(((x*34.0)+1.0)*x); }
+    vec4 taylorInvSqrt (vec4 r) { return 1.79284291400159 - 0.85373472095314 * r; }
+    vec2 fade (vec2 t) { return t*t*t*(t*(t*6.0-15.0)+10.0); }
+
+    // Classic 2D Perlin noise
+    float cnoise (vec2 P) {
+        vec4 Pi = floor(P.xyxy) + vec4(0.0, 0.0, 1.0, 1.0);
+        vec4 Pf = fract(P.xyxy) - vec4(0.0, 0.0, 1.0, 1.0);
+        Pi = mod289(Pi); // To avoid truncation effects in permutation
+        vec4 ix = Pi.xzxz;
+        vec4 iy = Pi.yyww;
+        vec4 fx = Pf.xzxz;
+        vec4 fy = Pf.yyww;
+        
+        vec4 i = permute(permute(ix) + iy);
+        
+        vec4 gx = fract(i * (1.0 / 41.0)) * 2.0 - 1.0 ;
+        vec4 gy = abs(gx) - 0.5 ;
+        vec4 tx = floor(gx + 0.5);
+        gx = gx - tx;
+        
+        vec2 g00 = vec2(gx.x,gy.x);
+        vec2 g10 = vec2(gx.y,gy.y);
+        vec2 g01 = vec2(gx.z,gy.z);
+        vec2 g11 = vec2(gx.w,gy.w);
+        
+        vec4 norm = taylorInvSqrt(vec4(dot(g00, g00), dot(g01, g01), dot(g10, g10), dot(g11, g11)));
+        g00 *= norm.x;  
+        g01 *= norm.y;  
+        g10 *= norm.z;  
+        g11 *= norm.w;  
+        
+        float n00 = dot(g00, vec2(fx.x, fy.x));
+        float n10 = dot(g10, vec2(fx.y, fy.y));
+        float n01 = dot(g01, vec2(fx.z, fy.z));
+        float n11 = dot(g11, vec2(fx.w, fy.w));
+        
+        vec2 fade_xy = fade(Pf.xy);
+        vec2 n_x = mix(vec2(n00, n01), vec2(n10, n11), fade_xy.x);
+        float n_xy = mix(n_x.x, n_x.y, fade_xy.y);
+        return 2.3 * n_xy;
+    }
+
+
+    float noise(vec2 p){         
+        return  0.4 * cnoise(p);    
+    }
+
+    float pattern( in vec2 uv, in float time){   
+        
+        //get a noise value q
+        vec2 q = vec2(9.0, 0.);
+        q.y = noise(uv + vec2(2.2*time,1.3*time)) ;
+        
+        //now warp uv space by q and get noise on that
+        vec2 r = vec2(0.);
+        r.x = noise(uv + 4.0 * q + vec2(1.7,9.2));
+        
+        //now warp uv space by r and get noise on that
+        return noise(uv + 4.0*r);
+
+    }
+
+    const float SCALE = 5.0;
+    const float BRIGHTNESS = 1.5;
+    const float SPEED = 0.05;
+        
+    varying vec2 vUv;
+
+    uniform float time;
+
+    void main() {
+
+        vec2 st = vUv;
+        vec2 uv = -1.0 + 2. * st;
+        uv *= SCALE / (0.1 + distance(st,vec2(0.5)));
+        float time = time*SPEED;
+        vec3 color = vec3(pattern(uv,time)*BRIGHTNESS);
+        color += distance(st,vec2(0.5));
+        color *= distance(st,vec2(0.5));
+        gl_FragColor = vec4(color,1.0);
+    }
+</script>
+<script>
+    if ( WEBGL.isWebGLAvailable() === false ) {
+        document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+    }
+    var container;
+    var camera, scene, renderer;
+    var uniforms;
+    init();
+    animate();
+    function init() {
+        container = document.querySelector( '.homepage-splash-tile' );
+        camera = new THREE.OrthographicCamera( - 1, 1, 1, - 1, 0, 1 );
+        scene = new THREE.Scene();
+        var geometry = new THREE.PlaneBufferGeometry( 2, 2 );
+        uniforms = {
+            "time": { value: 1.0 }
+        };
+        var material = new THREE.ShaderMaterial( {
+            uniforms: uniforms,
+            vertexShader: document.getElementById( 'vertexShader' ).textContent,
+            fragmentShader: document.getElementById( 'fragmentShader' ).textContent
+        } );
+        var mesh = new THREE.Mesh( geometry, material );
+        scene.add( mesh );
+        renderer = new THREE.WebGLRenderer();
+        renderer.setPixelRatio( window.devicePixelRatio );
+        container.appendChild( renderer.domElement );
+        onWindowResize();
+        window.addEventListener( 'resize', onWindowResize, false );
+    }
+    function onWindowResize() {
+        renderer.setSize( window.innerWidth, window.innerHeight );
+    }
+    //
+    function animate( timestamp ) {
+        requestAnimationFrame( animate );
+        uniforms[ "time" ].value = timestamp / 1000;
+        renderer.render( scene, camera );
+    }
+</script>

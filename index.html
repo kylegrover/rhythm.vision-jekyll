@@ -4,26 +4,16 @@ layout: body
 
 <h2 style="position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);">rhythm.vision is coming soon</h2>
 
-{% comment %}
 <div class="home">
 
-  <div class="rhythm-vision-splash">
+  {% include home-splash.html %}
 
-  </div>
-
-  <ul class="post-list">
     {% for post in site.posts %}
-      {% if post.featured %}
-        <li>
-          <span class="post-meta">{{ post.date | date: "%b %-d, %Y" }}</span>
-
+        <div class="homepage-video">
           <h2>
             <a class="post-link" href="{{ post.url | prepend: site.baseurl }}">{{ post.title }}</a>
           </h2>
-        </li>
-      {% endif %}
+        </div>
     {% endfor %}
-  </ul>
 
 </div>
-{% endcomment %}
